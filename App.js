@@ -17,6 +17,7 @@ export default function App() {
             backgroundColor: '#a09eba',
           },
           headerTitleAlign: 'center',
+          headerTintColor: 'black',
         }}>
         <Stack.Screen
           name='HomeScreen'
