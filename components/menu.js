@@ -2,12 +2,25 @@ import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
 import { Cell, Section, TableView } from 'react-native-tableview-simple';
 
 // displays menu of the selected restaurant
-export function Menu({ navigation, route }) {
+const Menu = ({ navigation, route }) => {
+  // function to handle cell press
+  const handlePress = (cell) => {
+    navigation.navigate('MenuItem', {
+      restaurant: route.params.restaurantName,
+      itemName: cell.name,
+      itemPrice: cell.price,
+      itemDesc: cell.description,
+      itemImg: cell.imgUrl,
+      isinstock: cell.instock,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.toptext}>{route.params.restaurantName}</Text>
       <ScrollView>
         <Image source={route.params.image} style={styles.imgStyle} />
+
         <TableView>
           {route.params.items.map((item, i) => (
             <Section
@@ -31,17 +44,10 @@ export function Menu({ navigation, route }) {
                   accessory={
                     cell.instock ? 'DisclosureIndicator' : 'DetailDisclosure'
                   }
-                  backgroundColor={cell.instock ? '#fff' : '#c19e9e'}
-                  onPress={() =>
-                    navigation.navigate('MenuItem', {
-                      restaurant: route.params.restaurantName,
-                      itemName: cell.name,
-                      itemPrice: cell.price,
-                      itemDesc: cell.description,
-                      itemImg: cell.imgUrl,
-                      isinstock: cell.instock,
-                    })
-                  }
+                  backgroundColor={cell.instock ? '#fff' : '#dc9a9a'}
+                  onPress={() => {
+                    handlePress(cell);
+                  }}
                 />
               ))}
             </Section>
@@ -50,7 +56,7 @@ export function Menu({ navigation, route }) {
       </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -60,8 +66,8 @@ const styles = StyleSheet.create({
   toptext: {
     margin: 10,
     padding: 10,
-    color: '#e6cab3',
-    backgroundColor: '#82401d',
+    color: '#bfcddf',
+    backgroundColor: '#1d3d82',
     fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -76,13 +82,13 @@ const styles = StyleSheet.create({
   headerText: {
     marginBottom: 5,
     padding: 6,
-    backgroundColor: '#dcc3ae',
+    backgroundColor: '#bfcddf',
     textAlign: 'center',
-    color: '#733838',
+    color: '#0b0b0b',
     fontSize: 22,
     fontWeight: 'bold',
     borderWidth: 2,
-    borderColor: '#733838',
+    borderColor: '#0b0b0b',
   },
   titleTextStyle: {
     color: '#000',
@@ -90,3 +96,5 @@ const styles = StyleSheet.create({
     padding: 6,
   },
 });
+
+export { Menu };

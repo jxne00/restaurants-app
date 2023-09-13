@@ -7,9 +7,52 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 // displays details of the selected menu item
-export function MenuItem({ route, navigation }) {
+const MenuItem = ({ route, navigation }) => {
+  // render button based on whether item is in stock
+  const renderButton = () => {
+    route.params.isinstock ? (
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.buttonStyle}
+          onPress={handleButtonPress}>
+          <Ionicons name="cart-outline" size={24} color="#d4d4d4" />
+          <Text style={styles.buttonText}>Add to cart</Text>
+        </TouchableOpacity>
+      </View>
+    ) : (
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={handleButtonPress}>
+          <MaterialIcons name="error-outline" size={24} color="#d4d4d4" />
+          <Text style={styles.buttonText}>Out of Stock!</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  // function to handle button press
+  const handleButtonPress = () => {
+    Alert.alert(
+      route.params.isinstock
+        ? route.params.itemName + ' added to cart!'
+        : route.params.itemName + ' is out of stock!',
+      '',
+      [
+        {
+          text: 'Ok',
+          onPress: () => {
+            navigation.goBack(); // direct back to Menu Screen
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
@@ -25,34 +68,11 @@ export function MenuItem({ route, navigation }) {
         </View>
 
         {/* button showing either 'add to cart' or 'out of stock' */}
-        <TouchableOpacity
-          style={styles.buttonStyle}
-          onPress={() =>
-            Alert.alert(
-              route.params.isinstock
-                ? route.params.itemName + ' added to cart!'
-                : route.params.itemName + ' is out of stock!',
-              '',
-              [
-                {
-                  text: 'Ok',
-                  // direct back to Menu Screen
-                  onPress: () => {
-                    navigation.goBack();
-                  },
-                },
-              ],
-              { cancelable: true }
-            )
-          }>
-          <Text style={styles.buttonText}>
-            {route.params.isinstock ? 'Add to cart' : 'Out of Stock!'}
-          </Text>
-        </TouchableOpacity>
+        {renderButton()}
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -77,13 +97,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 25,
-    marginTop: 15,
+    marginTop: 20,
   },
   descText: {
     fontSize: 18,
     margin: 20,
   },
-  buttonStyle: {
+  buttonContainer: {
     backgroundColor: '#61617b',
     height: 55,
     width: '85%',
@@ -94,9 +114,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     position: 'absolute',
   },
+  buttonStyle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   buttonText: {
     color: '#d4d4d4',
     fontSize: 18,
     fontWeight: 'bold',
+    marginLeft: 10,
   },
 });
+
+export { MenuItem };
