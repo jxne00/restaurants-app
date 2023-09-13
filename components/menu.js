@@ -44,7 +44,7 @@ const Menu = ({ navigation, route }) => {
                   accessory={
                     cell.instock ? 'DisclosureIndicator' : 'DetailDisclosure'
                   }
-                  backgroundColor={cell.instock ? '#fff' : '#dc9a9a'}
+                  backgroundColor={cell.instock ? '#fff' : '#c57a7a'}
                   onPress={() => {
                     handlePress(cell);
                   }}

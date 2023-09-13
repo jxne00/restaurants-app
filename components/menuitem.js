@@ -1,56 +1,44 @@
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Image,
   SafeAreaView,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
-// displays details of the selected menu item
-const MenuItem = ({ route, navigation }) => {
-  // render button based on whether item is in stock
-  const renderButton = () => {
-    route.params.isinstock ? (
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.buttonStyle}
-          onPress={handleButtonPress}>
-          <Ionicons name="cart-outline" size={24} color="#d4d4d4" />
-          <Text style={styles.buttonText}>Add to cart</Text>
-        </TouchableOpacity>
-      </View>
-    ) : (
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.buttonContainer}
-          onPress={handleButtonPress}>
-          <MaterialIcons name="error-outline" size={24} color="#d4d4d4" />
-          <Text style={styles.buttonText}>Out of Stock!</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+import { CheckIfExist, GetItemQuantity } from '../data/handleCart';
+import { AddToCartModal } from './addToCartModal';
 
-  // function to handle button press
+// displays details of the selected menu item
+const MenuItem = ({ route }) => {
+  const [modalVisible, setModalVisible] = useState(false); // modal to add item to cart
+  const [quantity, setQuantity] = useState(0); // quantity of item to add to cart
+  const [alreadyInCart, setAlreadyInCart] = useState(false);
+
+  useEffect(() => {
+    // check if item is already in cart
+    const checkIfInCart = async () => {
+      const exist = await CheckIfExist(route.params.id);
+      setAlreadyInCart(exist);
+    };
+    checkIfInCart();
+  }, []);
+
+  useEffect(() => {
+    // get quantity of item in cart
+    const getQuantity = async () => {
+      const itemQuantity = await GetItemQuantity(route.params.id);
+      setQuantity(itemQuantity);
+    };
+    getQuantity();
+  }, []);
+
+  // show modal to add item to cart
   const handleButtonPress = () => {
-    Alert.alert(
-      route.params.isinstock
-        ? route.params.itemName + ' added to cart!'
-        : route.params.itemName + ' is out of stock!',
-      '',
-      [
-        {
-          text: 'Ok',
-          onPress: () => {
-            navigation.goBack(); // direct back to Menu Screen
-          },
-        },
-      ],
-      { cancelable: true },
-    );
+    setModalVisible(true);
   };
 
   return (
@@ -67,8 +55,36 @@ const MenuItem = ({ route, navigation }) => {
           <Text style={styles.descText}>{route.params.itemDesc}</Text>
         </View>
 
-        {/* button showing either 'add to cart' or 'out of stock' */}
-        {renderButton()}
+        {/* render different buttons depending on whether item is in stock */}
+        {route.params.isinstock ? (
+          // add for adding item to cart if in stock
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              onPress={handleButtonPress}>
+              <Ionicons name="cart-outline" size={24} color="#d4d4d4" />
+              <Text style={styles.buttonText}>Add to cart</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          // disabled button for out of stock items
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.buttonStyle} disabled={'true'}>
+              <MaterialIcons name="error-outline" size={24} color="#d4d4d4" />
+              <Text style={styles.buttonText}>Out of Stock!</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* modal to add item to cart */}
+        <AddToCartModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          quantity={quantity}
+          setQuantity={setQuantity}
+          alreadyInCart={alreadyInCart}
+          item={route.params}
+        />
       </View>
     </SafeAreaView>
   );
